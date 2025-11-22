@@ -12,46 +12,42 @@ export function useAuth() {
 
   const isLoginPage = pathname === "/login" || pathname === "/register";
 
-  // 1. Check session
   const { data: user, isLoading: queryLoading } = useQuery({
     queryKey: ["auth", "me"],
     queryFn: () => authAPI.me().then((res) => res.data.user),
     retry: false,
     staleTime: 1000 * 60 * 10,
     refetchOnWindowFocus: !isLoginPage,
-    enabled: !isLoginPage, // Don't run on login/register
+    enabled: !isLoginPage,
   });
 
-  // 2. Login mutation with auto-redirect
   const loginMutation = useMutation({
     mutationFn: authAPI.login,
     onSuccess: () => {
-      // Invalidate and refetch user
       queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
-
-      // Redirect to dashboard (or intended page)
-      router.push("/dashboard");
-      router.refresh(); // Optional: force refresh to update server components
-    },
-    onError: (error) => {
-      console.error("Login failed:", error);
-      // Optional: show toast
     },
   });
 
-  // 3. Logout
+  // PERFECT LOGOUT: Clear cache FIRST → then redirect
   const logoutMutation = useMutation({
     mutationFn: authAPI.logout,
+    onMutate: async () => {
+      // Prevent queries from updating during logout
+      await queryClient.cancelQueries({ queryKey: ["auth", "me"] });
+    },
     onSuccess: () => {
+      // Redirect immediately
       router.push("/login");
-      queryClient.clear();
+
+      // Only clear cache after a short delay to ensure unmount
+      setTimeout(() => {
+        queryClient.clear();
+      }, 100); // 100ms is enough for route change
     },
   });
 
-  // 4. Inactivity logout
   useInactivityLogout(!!user && !isLoginPage);
 
-  // Optional: Auto-redirect if logged in and on login page
   useEffect(() => {
     if (user && isLoginPage) {
       router.replace("/dashboard");
@@ -65,6 +61,5 @@ export function useAuth() {
     login: loginMutation.mutateAsync,
     logout: logoutMutation.mutate,
     isLoggingIn: loginMutation.isPending,
-    isLoggingOut: logoutMutation.isPending,
   };
 }

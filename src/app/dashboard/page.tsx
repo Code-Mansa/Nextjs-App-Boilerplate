@@ -1,4 +1,5 @@
 "use client";
+
 import { useAuth } from "@/hooks/useAuth";
 import {
   Card,
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 const Page = () => {
   const { user, isLoading, logout } = useAuth();
 
+  // Show loading skeleton on initial load
   if (isLoading) {
     return (
       <div className='container mx-auto px-4 py-16'>
@@ -46,9 +48,10 @@ const Page = () => {
             <p className='font-medium'>{user?.username || "—"}</p>
           </div>
 
-          <Button onClick={() => logout()} className=' px-5 py-2 rounded-xl'>
+          <Button onClick={() => logout()} variant='destructive'>
             Logout
           </Button>
+
           <div className='pt-4 border-t'>
             <p className='text-xs text-muted-foreground'>
               You will be logged out after 30 minutes of inactivity.
