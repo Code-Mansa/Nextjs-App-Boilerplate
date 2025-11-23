@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -45,6 +46,16 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
+          <p className='text-sm'>
+            Don&apos;t have an account?{" "}
+            <Link
+              href='/signup'
+              className='hover:underline font-semibold text-indigo-700'>
+              Signup
+            </Link>
+          </p>
+
           <Button type='submit' className='w-full' disabled={isLoggingIn}>
             {isLoggingIn ? "Logging in..." : "Login"}
           </Button>

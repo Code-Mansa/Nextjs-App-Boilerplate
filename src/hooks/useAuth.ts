@@ -10,7 +10,7 @@ export function useAuth() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isLoginPage = pathname === "/login" || pathname === "/register";
+  const isLoginPage = pathname === "/login" || pathname === "/signup";
 
   const { data: user, isLoading: queryLoading } = useQuery({
     queryKey: ["auth", "me"],
@@ -24,6 +24,14 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: authAPI.login,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+    },
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: authAPI.register,
+    onSuccess: () => {
+      // Automatically invalidate user query to fetch the new user
       queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
     },
   });
@@ -58,8 +66,11 @@ export function useAuth() {
     user: user || null,
     isLoading: queryLoading && !isLoginPage,
     isAuthenticated: !!user,
+    register: registerMutation.mutateAsync,
     login: loginMutation.mutateAsync,
     logout: logoutMutation.mutate,
+    isRegistering: registerMutation.isPending,
     isLoggingIn: loginMutation.isPending,
+    isRegisterError: registerMutation.isError,
   };
 }
