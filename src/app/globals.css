@@ -119,4 +119,12 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Hide scrollbar but keep it functional — works on all browsers */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 }

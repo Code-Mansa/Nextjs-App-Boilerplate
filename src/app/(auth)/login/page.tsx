@@ -11,7 +11,7 @@ import Link from "next/link";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isLoggingIn } = useAuth();
+  const { login, isLoggingIn, loginError } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -30,7 +30,12 @@ export default function LoginPage() {
   return (
     <div className='min-h-screen flex items-center justify-center'>
       <Card className='w-96 p-8'>
-        <h1 className='text-2xl font-bold mb-6'>Login</h1>
+        <h1 className='text-2xl font-bold mb-2'>Login</h1>
+        {loginError && (
+          <div className='bg-red-100 text-red-600 p-3 rounded-lg text-sm'>
+            {loginError}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className='space-y-4'>
           <Input
             type='email'
