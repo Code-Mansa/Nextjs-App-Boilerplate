@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   if (!success) {
     return NextResponse.json(
       { msg: "Too many login attempts. Please try again later." },
-      { status: 429 }
+      { status: 429 },
     );
   }
 
@@ -43,11 +43,21 @@ export async function POST(req: NextRequest) {
   // User login logic
   // -------------------------------
   const user = await User.findOne({ email });
-  if (!user || !(await compare(password, user.password))) {
+  if (!user) {
     return NextResponse.json(
       { msg: "Incorrect email or password." },
-      { status: 400 }
+      { status: 400 },
     );
+  }
+
+  if (user.provider === "credentials") {
+    const valid = await compare(password, user.password);
+    if (!valid) {
+      return NextResponse.json(
+        { msg: "Incorrect email or password." },
+        { status: 400 },
+      );
+    }
   }
 
   const { refreshToken } = await generateAndStoreRefreshToken(user);
@@ -65,7 +75,7 @@ export async function POST(req: NextRequest) {
   res.cookies.set("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     path: "/",
     maxAge: 7 * 24 * 60 * 60,
   });

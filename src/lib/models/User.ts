@@ -10,6 +10,11 @@ const userSchema = new mongoose.Schema({
     default: "member",
     required: true,
   },
+  provider: {
+    type: String,
+    enum: ["credentials", "google"],
+    default: "credentials",
+  },
 });
 
 export default mongoose.models.User || mongoose.model("User", userSchema);

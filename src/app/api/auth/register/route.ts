@@ -6,12 +6,12 @@ import { connectDB } from "@/lib/mongoose";
 
 export async function POST(req: NextRequest) {
   await connectDB();
-  const { email, password, username } = await req.json();
+  const { email, password, username, provider } = await req.json();
 
   if (!email || !password)
     return NextResponse.json(
       { msg: "email & password required" },
-      { status: 400 }
+      { status: 400 },
     );
 
   const exists = await User.findOne({ email });
@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
     password: hashed,
     username,
     role: "member",
+    provider: provider ?? "credentials",
   });
 
   const { refreshToken } = await generateAndStoreRefreshToken(user);
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
   res.cookies.set("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     path: "/",
     maxAge: 7 * 24 * 60 * 60, // 7 days
   });

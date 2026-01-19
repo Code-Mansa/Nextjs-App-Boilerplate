@@ -1,4 +1,3 @@
-// src/hooks/useInactivityLogout.ts
 import { useEffect, useRef } from "react";
 import { authAPI } from "@/services/endpoints";
 

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -65,6 +66,14 @@ export default function LoginPage() {
             {isLoggingIn ? "Logging in..." : "Login"}
           </Button>
         </form>
+
+        <Button
+          type='button'
+          variant='outline'
+          className='w-full py-4 rounded-full mt-6'
+          onClick={() => signIn("google", { callbackUrl: "/dashboard" })}>
+          Continue with Google
+        </Button>
       </Card>
     </div>
   );
